@@ -197,6 +197,19 @@ These rules are direct preventatives for recurring mistakes observed during AI c
    - All component and E2E tests must locate elements using accessibility primitives (`getByRole`, `getByLabelText`, `getByLabel`), never by brittle CSS class selectors or query selectors.
 10. **Test Naming Convention ("What Must Be True")**:
    - Every test case name must clearly declare the expected truth or invariant (e.g., `it('cart subtotal under 300 SAR must charge 25 SAR shipping...')`, `it('submitting empty required fields must display validation error alerts...')`).
+11. **State Ownership Matrix ("Who Owns What State")**:
+   - Always adhere to strict single-source-of-truth ownership for every data domain:
+
+| Domain Data | Owner / Storage | How Components Access It |
+| :--- | :--- | :--- |
+| **Product Catalog** | Server Component / API | Fetched via `products.api.ts` / Route Handlers, rendered on server |
+| **Catalog Filters & Search** | URL Search Params (`?q=&category=&sort=`) | `useSearchParams()` & `useRouter()` (shareable, bookmarkable) |
+| **Cart Items** | React Context (`useCart`) + localStorage | `useCart()` custom hook (delta mutations: `+1` / `-1`) |
+| **Active Coupon** | React Context (`useCart`) | Derived via pure `calculateCouponDiscount()` in `cart.logic.ts` |
+| **Desk Setup Selection** | Setup Configurator Local State | React `useState` inside `SetupDetailView.tsx` |
+| **Reviews & Ratings** | Mock API / Storage + Optimistic | `reviews.api.ts` with optimistic review submission |
+| **Theme (Light / Dark)** | Theme Provider / HTML `class` | Radix / Next-themes `class="dark"` toggle |
+| **API Demo Switches** | Route Path & Query Params | `/api/delay/:ms`, `/api/fail/:code`, `/api/empty` |
 
 ---
 
